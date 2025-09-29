@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Canvas Task',
-  description: 'recommend-task',
+  description: 'Recommend Task',
 };
 
 export default function RootLayout({
@@ -17,6 +17,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="emotion-insertion-point" content="" />
+      </head>
       <body className={inter.className}>
         <ThemeProvider>{children}</ThemeProvider>
       </body>

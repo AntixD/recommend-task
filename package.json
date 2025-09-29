@@ -9,7 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@emotion/cache": "^11.14.0",
     "@emotion/react": "^11.14.0",
+    "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.2",
     "@mui/material": "^7.3.2",
@@ -21,6 +23,7 @@
     "@tiptap/extension-heading": "^3.6.1",
     "@tiptap/extension-history": "^3.6.1",
     "@tiptap/extension-italic": "^3.6.1",
+    "@tiptap/extension-link": "^3.6.1",
     "@tiptap/extension-ordered-list": "^3.6.1",
     "@tiptap/extension-placeholder": "^3.6.1",
     "@tiptap/react": "^3.6.1",

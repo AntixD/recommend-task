@@ -5,11 +5,11 @@ const responses = [
 
   "Based on what you've described, I recommend focusing on three key areas: performance optimization, user experience, and maintainability. These will provide the best foundation for your project.",
 
-  'Let me explain this differently. Think of it like building blocks - each component serves a specific purpose. When combined properly, they create a robust and scalable system.',
+  'Let me explain this from a different perspective. Think of it like building blocks where each component serves a specific purpose. When combined properly, they create a robust and scalable system.',
 
-  'Great follow-up question! Building on our previous discussion, we should also consider error handling, testing strategies, and documentation. These often-overlooked aspects are crucial for long-term success.',
+  'Great follow-up! Building on our previous discussion, we should also consider error handling, testing strategies, and documentation. These often-overlooked aspects are crucial for long-term success.',
 
-  "To summarize our conversation so far: we've covered the basic architecture, implementation strategies, and best practices. The next step would be to create a proof of concept to validate these ideas.",
+  "To address your question directly: the solution involves balancing complexity with maintainability. Let's explore some practical examples that demonstrate these principles in action.",
 ];
 
 let responseIndex = 0;
@@ -17,9 +17,11 @@ let responseIndex = 0;
 export function getRandomResponse(): string {
   const response = responses[responseIndex % responses.length];
   responseIndex++;
+  console.log(
+    'Returning response #',
+    responseIndex,
+    ':',
+    response.substring(0, 50) + '...'
+  );
   return response;
-}
-
-export function resetResponseIndex(): void {
-  responseIndex = 0;
 }

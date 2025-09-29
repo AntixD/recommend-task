@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -8,6 +8,7 @@ import Link from '@tiptap/extension-link';
 import { Paper } from '@mui/material';
 import { EditorToolbar } from '@/components/molecules/EditorToolbar';
 import { useAppStore } from '@/store/appStore';
+import { useStreamingContent } from '@/hooks/useStreamingContent';
 
 interface EditorContainerProps {
   initialContent?: string;
@@ -20,22 +21,15 @@ export const EditorContainer: React.FC<EditorContainerProps> = ({
   onChange,
   isReadOnly = false,
 }) => {
-  const {
-    editorState,
-    setEditorContent,
-    clearStreamingContent,
-    isFirstMessage,
-  } = useAppStore();
-
-  const lastStreamingContent = useRef('');
-  const hasCleared = useRef(false);
+  const { editorState, setEditorContent, clearStreamingContent, chatSession } =
+    useAppStore();
+  const [messageCount, setMessageCount] = useState(0);
 
   const editor = useEditor({
     extensions: [
       StarterKit,
       Placeholder.configure({
-        placeholder:
-          'Welcome to Canvas Editor! Start a conversation in the chat panel to see AI responses stream here...',
+        placeholder: 'Start typing or send a message in chat...',
       }),
       Link.configure({
         openOnClick: false,
@@ -52,51 +46,24 @@ export const EditorContainer: React.FC<EditorContainerProps> = ({
   });
 
   useEffect(() => {
-    if (editor && editorState.streamingContent) {
-      const newContent = editorState.streamingContent.slice(
-        lastStreamingContent.current.length
-      );
+    const aiMessages = chatSession.messages.filter(
+      (m) => m.role === 'assistant'
+    ).length;
+    setMessageCount(aiMessages);
+  }, [chatSession.messages]);
 
-      if (newContent) {
-        if (
-          isFirstMessage &&
-          !hasCleared.current &&
-          lastStreamingContent.current === ''
-        ) {
-          editor.commands.clearContent();
-          hasCleared.current = true;
-        }
-
-        if (lastStreamingContent.current === '' && !isFirstMessage) {
-          editor.commands.focus('end');
-          editor.commands.insertContent('<br><br><hr><br>');
-        }
-
-        editor.commands.focus('end');
-        editor.commands.insertContent(newContent);
-        lastStreamingContent.current = editorState.streamingContent;
-      }
-    }
-
-    if (
-      editorState.streamingContent === '' &&
-      lastStreamingContent.current !== ''
-    ) {
-      lastStreamingContent.current = '';
-    }
-  }, [editorState.streamingContent, editor, isFirstMessage]);
+  useStreamingContent({
+    editor,
+    streamingContent: editorState.streamingContent,
+    messageCount,
+    onReset: clearStreamingContent,
+  });
 
   useEffect(() => {
     if (editor) {
       editor.setEditable(!isReadOnly && editorState.isEditable);
     }
   }, [editor, editorState.isEditable, isReadOnly]);
-
-  useEffect(() => {
-    return () => {
-      clearStreamingContent();
-    };
-  }, [clearStreamingContent]);
 
   if (!editor) {
     return (

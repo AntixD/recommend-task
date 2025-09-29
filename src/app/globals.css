@@ -66,9 +66,20 @@ body {
 }
 
 .ProseMirror hr {
+  margin: 1.5rem 0;
   border: none;
-  border-top: 1px solid #e5e7eb;
-  margin: 1rem 0;
+  border-top: 2px solid #e5e7eb;
+}
+
+.ProseMirror strong {
+  color: #4b5563;
+  font-weight: 600;
+}
+
+/* Ensure content is visible */
+.ProseMirror p {
+  margin: 0.5rem 0;
+  line-height: 1.6;
 }
 
 .ProseMirror .message-label {

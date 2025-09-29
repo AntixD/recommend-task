@@ -7,6 +7,7 @@ import { Button } from '@/components/atoms/Button';
 import { Preview } from '@mui/icons-material';
 import { useAppStore } from '@/store/appStore';
 import { SkeletonLoader } from '../molecules/SkeletonLoader';
+import { openPreviewWindow } from '@/utils/preview';
 
 const EditorContainer = dynamic(
   () =>
@@ -27,15 +28,6 @@ export const CanvasView: React.FC = () => {
     setMounted(true);
   }, []);
 
-  const handlePreview = () => {
-    if (typeof window !== 'undefined') {
-      const previewWindow = window.open('/preview', '_blank');
-      if (previewWindow) {
-        localStorage.setItem('previewContent', editorState.content);
-      }
-    }
-  };
-
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       <div className="bg-white border-b border-gray-200 px-6 py-3 flex justify-between items-center">
@@ -46,7 +38,7 @@ export const CanvasView: React.FC = () => {
         <Button
           variant="outlined"
           startIcon={<Preview />}
-          onClick={handlePreview}
+          onClick={() => openPreviewWindow(editorState.content)}
           className="normal-case"
         >
           Preview

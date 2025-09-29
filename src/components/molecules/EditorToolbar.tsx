@@ -1,31 +1,29 @@
 import React from 'react';
 import { Editor } from '@tiptap/react';
 import { IconButton, Divider, Tooltip } from '@mui/material';
-import {
-  FormatBold,
-  FormatItalic,
-  FormatListBulleted,
-  FormatListNumbered,
-  FormatQuote,
-  Code,
-  Undo,
-  Redo,
-  FormatClear,
-  Title,
-  Link,
-} from '@mui/icons-material';
+import { toolbarConfig } from '@/config/editorToolbar.config';
 
 interface EditorToolbarProps {
   editor: Editor | null;
+  className?: string;
+  showGroups?: string[];
 }
 
-const ToolbarButton: React.FC<{
+interface ToolbarButtonProps {
   onClick: () => void;
   isActive?: boolean;
   disabled?: boolean;
   tooltip: string;
   icon: React.ReactNode;
-}> = ({ onClick, isActive = false, disabled = false, tooltip, icon }) => (
+}
+
+const ToolbarButton: React.FC<ToolbarButtonProps> = ({
+  onClick,
+  isActive = false,
+  disabled = false,
+  tooltip,
+  icon,
+}) => (
   <Tooltip title={tooltip} arrow>
     <span>
       <IconButton
@@ -55,124 +53,47 @@ const ToolbarButton: React.FC<{
   </Tooltip>
 );
 
-const ToolbarDivider: React.FC = () => (
-  <Divider orientation="vertical" flexItem sx={{ mx: 0.5, my: 1 }} />
-);
-
-export const EditorToolbar: React.FC<EditorToolbarProps> = ({ editor }) => {
+export const EditorToolbar: React.FC<EditorToolbarProps> = ({
+  editor,
+  className = '',
+  showGroups,
+}) => {
   if (!editor) {
     return (
       <div className="h-12 border-b border-gray-200 bg-gray-50 animate-pulse" />
     );
   }
 
-  const addLink = () => {
-    const url = window.prompt('Enter URL:');
-    if (url) {
-      editor.chain().focus().setLink({ href: url }).run();
-    }
-  };
-
-  const removeLink = () => {
-    editor.chain().focus().unsetLink().run();
-  };
+  const groups = showGroups
+    ? toolbarConfig.filter((group) => showGroups.includes(group.id))
+    : toolbarConfig;
 
   return (
-    <div className="flex items-center px-2 py-1 border-b border-gray-200 bg-white flex-wrap">
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleBold().run()}
-        isActive={editor.isActive('bold')}
-        tooltip="Bold (Ctrl+B)"
-        icon={<FormatBold fontSize="small" />}
-      />
+    <div
+      className={`flex items-center px-2 py-1 border-b border-gray-200 bg-white flex-wrap ${className}`}
+    >
+      {groups.map((group, groupIndex) => (
+        <React.Fragment key={group.id}>
+          {group.items.map((item) => {
+            const IconComponent = item.icon;
 
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleItalic().run()}
-        isActive={editor.isActive('italic')}
-        tooltip="Italic (Ctrl+I)"
-        icon={<FormatItalic fontSize="small" />}
-      />
+            return (
+              <ToolbarButton
+                key={item.id}
+                onClick={() => item.action(editor)}
+                isActive={item.isActive?.(editor)}
+                disabled={item.isDisabled?.(editor)}
+                tooltip={item.tooltip}
+                icon={<IconComponent fontSize="small" />}
+              />
+            );
+          })}
 
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleCode().run()}
-        isActive={editor.isActive('code')}
-        tooltip="Inline Code"
-        icon={<Code fontSize="small" />}
-      />
-
-      <ToolbarDivider />
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        isActive={editor.isActive('heading', { level: 2 })}
-        tooltip="Heading"
-        icon={<Title fontSize="small" />}
-      />
-
-      <ToolbarDivider />
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
-        isActive={editor.isActive('bulletList')}
-        tooltip="Bullet List"
-        icon={<FormatListBulleted fontSize="small" />}
-      />
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
-        isActive={editor.isActive('orderedList')}
-        tooltip="Numbered List"
-        icon={<FormatListNumbered fontSize="small" />}
-      />
-
-      <ToolbarDivider />
-
-      <ToolbarButton
-        onClick={editor.isActive('link') ? removeLink : addLink}
-        isActive={editor.isActive('link')}
-        tooltip={editor.isActive('link') ? 'Remove Link' : 'Add Link'}
-        icon={<Link fontSize="small" />}
-      />
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleBlockquote().run()}
-        isActive={editor.isActive('blockquote')}
-        tooltip="Quote"
-        icon={<FormatQuote fontSize="small" />}
-      />
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-        isActive={editor.isActive('codeBlock')}
-        tooltip="Code Block"
-        icon={<Code fontSize="small" />}
-      />
-
-      <ToolbarDivider />
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().undo().run()}
-        disabled={!editor.can().undo()}
-        tooltip="Undo (Ctrl+Z)"
-        icon={<Undo fontSize="small" />}
-      />
-
-      <ToolbarButton
-        onClick={() => editor.chain().focus().redo().run()}
-        disabled={!editor.can().redo()}
-        tooltip="Redo (Ctrl+Y)"
-        icon={<Redo fontSize="small" />}
-      />
-
-      <ToolbarDivider />
-
-      <ToolbarButton
-        onClick={() =>
-          editor.chain().focus().unsetAllMarks().clearNodes().run()
-        }
-        tooltip="Clear Formatting"
-        icon={<FormatClear fontSize="small" />}
-      />
+          {groupIndex < groups.length - 1 && (
+            <Divider orientation="vertical" flexItem sx={{ mx: 0.5, my: 1 }} />
+          )}
+        </React.Fragment>
+      ))}
     </div>
   );
 };

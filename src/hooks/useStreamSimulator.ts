@@ -11,7 +11,6 @@ export function useStreamSimulator() {
     clearStreamingContent,
     setStreaming,
     setEditable,
-    setEditorContent,
   } = useAppStore();
 
   const startStreaming = useCallback(
@@ -19,23 +18,25 @@ export function useStreamSimulator() {
       text: string,
       chunkSize: number = 3,
       baseDelay: number = 100,
-      variableDelay: boolean = true,
-      clearPrevious: boolean = false
+      variableDelay: boolean = true
     ) => {
-      if (isStreaming) return;
+      if (intervalRef.current) {
+        clearTimeout(intervalRef.current);
+        intervalRef.current = null;
+      }
+
+      clearStreamingContent();
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       setIsStreaming(true);
       setStreaming(true);
       setEditable(false);
 
-      if (clearPrevious) {
-        setEditorContent('');
-      }
-
-      clearStreamingContent();
-
       const chunks = chunkText(text, chunkSize);
       let chunkIndex = 0;
+
+      console.log('Starting stream with', chunks.length, 'chunks');
 
       const streamChunk = () => {
         if (chunkIndex < chunks.length) {
@@ -45,20 +46,14 @@ export function useStreamSimulator() {
           const delay = variableDelay ? randomDelay(baseDelay) : baseDelay;
           intervalRef.current = setTimeout(streamChunk, delay);
         } else {
+          console.log('Stream complete');
           stopStreaming();
         }
       };
 
       streamChunk();
     },
-    [
-      isStreaming,
-      appendStreamingContent,
-      clearStreamingContent,
-      setStreaming,
-      setEditable,
-      setEditorContent,
-    ]
+    [appendStreamingContent, clearStreamingContent, setStreaming, setEditable]
   );
 
   const stopStreaming = useCallback(() => {
@@ -69,7 +64,11 @@ export function useStreamSimulator() {
     setIsStreaming(false);
     setStreaming(false);
     setEditable(true);
-  }, [setStreaming, setEditable]);
+
+    setTimeout(() => {
+      clearStreamingContent();
+    }, 100);
+  }, [setStreaming, setEditable, clearStreamingContent]);
 
   return {
     isStreaming,

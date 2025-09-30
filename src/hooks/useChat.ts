@@ -36,7 +36,12 @@ export function useChat() {
       };
       addMessage(assistantMessage);
 
-      await startStreaming(response, 4, 80, true);
+      try {
+        await startStreaming(response, 4, 80, true);
+      } catch (error) {
+        console.error('Streaming error:', error);
+        // still keep assistant message, don’t rethrow
+      }
 
       if (isFirstMessage) {
         setFirstMessage(false);

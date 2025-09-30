@@ -16,9 +16,14 @@ export const useStreamingContent = ({
 }: UseStreamingContentProps) => {
   const lastStreamingContent = useRef('');
   const hasWelcomeText = useRef(true);
+  const previousMessageCount = useRef(messageCount);
 
   useEffect(() => {
     if (!editor) return;
+    if (messageCount > previousMessageCount.current) {
+      editor.commands.focus('end');
+      previousMessageCount.current = messageCount;
+    }
 
     if (streamingContent) {
       const newContent = streamingContent.slice(
@@ -38,7 +43,16 @@ export const useStreamingContent = ({
 
         editor.commands.focus('end');
         editor.commands.insertContent(newContent);
+
         lastStreamingContent.current = streamingContent;
+
+        setTimeout(() => {
+          const editorElement = editor.view.dom;
+          const container = editorElement.closest('.overflow-y-auto');
+          if (container) {
+            container.scrollTop = container.scrollHeight;
+          }
+        }, 0);
       }
     }
 

@@ -1,13 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Paper, Button } from '@mui/material';
-import { ArrowBack } from '@mui/icons-material';
-import { useRouter } from 'next/navigation';
+import { Paper } from '@mui/material';
 
 export default function PreviewPage() {
   const [content, setContent] = useState<string>('');
-  const router = useRouter();
 
   useEffect(() => {
     const savedContent = localStorage.getItem('previewContent');

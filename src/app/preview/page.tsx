@@ -19,16 +19,6 @@ export default function PreviewPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-4">
-          <Button
-            startIcon={<ArrowBack />}
-            onClick={() => router.back()}
-            variant="outlined"
-          >
-            Back to Editor
-          </Button>
-        </div>
-
         <Paper elevation={2} className="p-8 bg-white">
           <div className="prose prose-lg max-w-none">
             <h1 className="text-2xl font-bold mb-4 text-gray-800">
